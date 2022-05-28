@@ -1,22 +1,23 @@
-from functools import partial
-from http.server import SimpleHTTPRequestHandler, test
 import base64
 import os
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, test
 
 PORT = 80
+
 
 class HTTPRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
 class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
-    """ Main class to present webpages and authentication. """
+    """Main class to present webpages and authentication."""
 
     def __init__(self, *args, **kwargs):
         username = kwargs.pop("username")
         password = kwargs.pop("password")
-        self._auth = base64.b64encode(
-            f"{username}:{password}".encode()).decode()
+        self._auth = base64.b64encode(f"{username}:{password}".encode()).decode()
         super().__init__(*args, **kwargs)
 
     def do_HEAD(self):
@@ -31,8 +32,8 @@ class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        """ Present frontpage with user authentication. """
-        if self.headers.get("Authorization") == None:
+        """Present frontpage with user authentication."""
+        if self.headers.get("Authorization") is None:
             self.do_AUTHHEAD()
             self.wfile.write(b"no auth header received")
         elif self.headers.get("Authorization") == "Basic " + self._auth:
@@ -50,12 +51,9 @@ if __name__ == "__main__":
             AuthHTTPRequestHandler,
             username=os.environ.get("USERNAME"),
             password=os.environ.get("PASSWORD"),
-            directory='/data',
+            directory="/data",
         )
         test(HandlerClass=handler_class, port=PORT)
     else:
-        handler_class = partial(
-            SimpleHTTPRequestHandler,
-            directory='/data'
-        )
+        handler_class = partial(SimpleHTTPRequestHandler, directory="/data")
         test(HandlerClass=handler_class, port=PORT)

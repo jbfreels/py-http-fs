@@ -1,4 +1,9 @@
 .vscode/
+.trunk/
+.flake8
+.hadolint.yaml
+.isort.cfg
+.markdownlint.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
