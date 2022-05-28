@@ -3,6 +3,11 @@ from http.server import SimpleHTTPRequestHandler, test
 import base64
 import os
 
+PORT = 80
+
+class HTTPRequestHandler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
     """ Main class to present webpages and authentication. """
@@ -40,10 +45,17 @@ class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
 
-    handler_class = partial(
-        AuthHTTPRequestHandler,
-        username=os.environ.get("USERNAME"),
-        password=os.environ.get("PASSWORD"),
-        directory='/data',
-    )
-    test(HandlerClass=handler_class, port=os.environ.get('PORT'))
+    if os.environ.get("USERNAME"):
+        handler_class = partial(
+            AuthHTTPRequestHandler,
+            username=os.environ.get("USERNAME"),
+            password=os.environ.get("PASSWORD"),
+            directory='/data',
+        )
+        test(HandlerClass=handler_class, port=PORT)
+    else:
+        handler_class = partial(
+            SimpleHTTPRequestHandler,
+            directory='/data'
+        )
+        test(HandlerClass=handler_class, port=PORT)
